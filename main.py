@@ -3,16 +3,16 @@ from random import *
 
 # 초기화
 pygame.init()
-screen_width = 600
-screen_height = 1000
+screen_width = 300
+screen_height = 500
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Tetris")
 
 # 기본 세팅 값
 rows = 20
 columns = 12
-cell_size = 50
-block_size = 44
+cell_size = 25
+block_size = 21
 cell_margin = 2
 
 # color
