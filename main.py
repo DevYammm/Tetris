@@ -86,6 +86,26 @@ def SpawnBlock(id):
         block_pos_1 = [block_pos_0[0] - 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_3 = [block_pos_0[0] - 1, block_pos_0[1] - 1]
+    elif id == 4:
+        block_pos_0 = [5, 1]
+        block_pos_1 = [block_pos_0[0] + 1, block_pos_0[1]]
+        block_pos_2 = [block_pos_0[0] - 1, block_pos_0[1]]
+        block_pos_3 = [block_pos_0[0] + 1, block_pos_0[1] - 1]
+    elif id == 5:
+        block_pos_0 = [5, 1]
+        block_pos_1 = [block_pos_0[0] + 1, block_pos_0[1]]
+        block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1] - 1]
+        block_pos_3 = [block_pos_0[0], block_pos_0[1] - 1]
+    elif id == 6:
+        block_pos_0 = [5, 1]
+        block_pos_1 = [block_pos_0[0] + 1, block_pos_0[1]]
+        block_pos_2 = [block_pos_0[0], block_pos_0[1] - 1]
+        block_pos_3 = [block_pos_0[0] - 1, block_pos_0[1] - 1]
+    elif id == 7:
+        block_pos_0 = [5, 1]
+        block_pos_1 = [block_pos_0[0] - 1, block_pos_0[1]]
+        block_pos_2 = [block_pos_0[0], block_pos_0[1] - 1]
+        block_pos_3 = [block_pos_0[0] + 1, block_pos_0[1] - 1]
 
     game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
     game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
@@ -102,7 +122,7 @@ while Running:
 
     if block_start_move == False:
         id = randrange(1, 8)
-        SpawnBlock(3)
+        SpawnBlock(id)
         block_start_move = True
     screen.fill(BLACK)
     BlockPrint()
