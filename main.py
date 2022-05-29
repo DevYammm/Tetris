@@ -1,4 +1,3 @@
-from turtle import down
 import pygame
 from random import *
 
@@ -13,15 +12,15 @@ def BlockPrint():
             elif col == 2:
                 DrawBlock(col_idx, row_idx, PURPLE)
             elif col == 3:
-                DrawBlock(col_idx, row_idx, ORANGE)
-            elif col == 4:
                 DrawBlock(col_idx, row_idx, BLUE)
+            elif col == 4:
+                DrawBlock(col_idx, row_idx, ORANGE)
             elif col == 5:
                 DrawBlock(col_idx, row_idx, YELLOW)
             elif col == 6:
-                DrawBlock(col_idx, row_idx, GREEN)
-            elif col == 7:
                 DrawBlock(col_idx, row_idx, RED)
+            elif col == 7:
+                DrawBlock(col_idx, row_idx, GREEN)
             elif col == 9:
                 DrawBlock(col_idx, row_idx, GRAY)
 
@@ -118,6 +117,7 @@ def DroppingBlock():
             game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
             game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
         
+# 블록 왼쪽으로 움직이기
 def BlockMoveLeft():
     global block_pos_0, block_pos_1, block_pos_2, block_pos_3
     if game_grid_list[block_pos_0[1]][block_pos_0[0] - 1] == 8 or game_grid_list[block_pos_1[1]][block_pos_1[0] - 1] == 8 or\
@@ -139,6 +139,7 @@ def BlockMoveLeft():
         game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
         game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
 
+# 블록 오른쪽으로 움직이기
 def BlockMoveRight():
     global block_pos_0, block_pos_1, block_pos_2, block_pos_3
     if game_grid_list[block_pos_0[1]][block_pos_0[0] + 1] == 8 or game_grid_list[block_pos_1[1]][block_pos_1[0] + 1] == 8 or\
@@ -160,6 +161,7 @@ def BlockMoveRight():
         game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
         game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
 
+# 블록 빠르게 내려가기
 def Drop():
     global block_pos_0, block_pos_1, block_pos_2, block_pos_3, block_start_move, drop_time
     if game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] == 8 or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]] == 8 or\
@@ -184,6 +186,7 @@ def Drop():
         game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
         game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
 
+# 블록 바로 내려가기
 def HardDrop():
     global block_pos_0, block_pos_1, block_pos_2, block_pos_3, block_start_move
     game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
@@ -208,6 +211,7 @@ def HardDrop():
             block_pos_2 = [block_pos_2[0], block_pos_2[1] + 1]
             block_pos_3 = [block_pos_3[0], block_pos_3[1] + 1]
 
+# 블록 돌리기
 def RotateBlock(id, rot):
     global block_pos_0, block_pos_1, block_pos_2, block_pos_3, rotate
     if game_grid_list[block_pos_0[1] - 1][block_pos_0[0] - 1] == 8 or game_grid_list[block_pos_0[1]][block_pos_0[0] - 1] == 8 or\
@@ -315,7 +319,23 @@ def RotateBlock(id, rot):
         game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
         game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
         game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
-            
+
+# 블록 라인 점검 (완성되면 삭제)  
+def LineCheck():
+    for idx, line in enumerate(game_grid_list):
+        success = True
+        for idx_bl, block in enumerate(line):
+            if idx_bl == 9:
+                continue
+            if block == 0:
+                success = False
+                break
+            if idx == 19:
+                success = False
+
+        if success == True:
+            del game_grid_list[idx]
+            game_grid_list.insert(0, [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8])
 
 # 초기화
 pygame.init()
@@ -353,6 +373,7 @@ block_pos_1 = []
 block_pos_2 = []
 block_pos_3 = []
 
+# 블록 스피드
 k_left_speed = 0
 k_right_speed = 0
 k_down_speed = 0
@@ -373,26 +394,29 @@ for idx, grid in enumerate(game_grid_list[rows - 1]):
 Running = True
 while Running:
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for event in pygame.event.get():  # 키보드, 마우스 입력 받기
+        if event.type == pygame.QUIT:  # 종료
             Running = False
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:  # 아래방향키
             if event.key == pygame.K_SPACE:
-                print('space')
                 HardDrop()
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_UP:  # 위방향키
                 rotate += 1
                 RotateBlock(id, rotate)
+            elif event.key == pygame.K_LEFT:  # 왼쪽방향키
+                BlockMoveLeft()
+            elif event.key == pygame.K_RIGHT:  # 오른쪽방향키
+                BlockMoveRight()
 
-    if event.type == pygame.KEYDOWN:
+    if event.type == pygame.KEYDOWN:  # 키가 눌렸을 때
         if event.key == pygame.K_LEFT:
             k_left_speed += 0.1
-            if k_left_speed >= 5:
+            if k_left_speed >= 8:
                 k_left_speed = 0
                 BlockMoveLeft()
         elif event.key == pygame.K_RIGHT:
             k_right_speed += 0.1
-            if k_right_speed >= 5:
+            if k_right_speed >= 8:
                 k_right_speed = 0
                 BlockMoveRight()
         elif event.key == pygame.K_DOWN:
@@ -401,21 +425,22 @@ while Running:
                 k_down_speed = 0
                 Drop()
 
-    elif event.type == pygame.KEYUP:
+    elif event.type == pygame.KEYUP:  # 키를 땠을 때 스피드 초기화
         k_left_speed = 0
         k_right_speed = 0
         k_down_speed = 0
         
-    if block_start_move == False:
+    if block_start_move == False:  # 처음 시작하거나 블록이 배치되었을 때, 새 블록 생성하기
+        LineCheck()
         rotate = 0
         id = randrange(1, 8)
         start_ticks = pygame.time.get_ticks()
         SpawnBlock(id)
         block_start_move = True
 
-    DroppingBlock()
+    DroppingBlock()  # 시간이 지나며 떨어짐
     screen.fill(BLACK)
-    BlockPrint()
+    BlockPrint()  # 리스트 화면 출력
 
     pygame.display.update()  # !!! 제발 마지막에 작성 꼭! 해주기 !!!
 
