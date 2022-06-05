@@ -2,7 +2,7 @@ import pygame
 from random import *
 
 # 게임 스크린 그리기
-def BlockPrint():
+def BlockRender():
     for row_idx, row in enumerate(game_grid_list):
         for col_idx, col in enumerate(row):
             if col == 8:
@@ -27,12 +27,19 @@ def BlockPrint():
 # 블록 그리기
 def DrawBlock(col_idx, row_idx, color):
     center_x = (col_idx * cell_size) + (cell_size / 2)
-    center_y = (row_idx * cell_size) + (cell_size / 2)
+    center_y = (row_idx * cell_size) + (cell_size / 2) - 50
 
     block = pygame.Rect(0, 0, block_size, block_size)
     block.center = (center_x, center_y)
 
     pygame.draw.rect(screen, color, block)
+
+# 블록 포지션 세팅
+def BlockPositionSet(id):
+    game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
+    game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
+    game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
+    game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
 
 # 블록 스폰하기
 def SpawnBlock(id):
@@ -46,40 +53,37 @@ def SpawnBlock(id):
         block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_3 = [block_pos_0[0] + 2, block_pos_0[1]]
     elif id == 2:
-        block_pos_0 = [5, 1]
+        block_pos_0 = [5, 3]
         block_pos_1 = [block_pos_0[0] - 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_3 = [block_pos_0[0], block_pos_0[1] - 1]
     elif id == 3:
-        block_pos_0 = [5, 1]
+        block_pos_0 = [5, 3]
         block_pos_1 = [block_pos_0[0] - 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_3 = [block_pos_0[0] - 1, block_pos_0[1] - 1]
     elif id == 4:
-        block_pos_0 = [5, 1]
+        block_pos_0 = [5, 3]
         block_pos_1 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0] - 1, block_pos_0[1]]
         block_pos_3 = [block_pos_0[0] + 1, block_pos_0[1] - 1]
     elif id == 5:
-        block_pos_0 = [5, 1]
+        block_pos_0 = [5, 3]
         block_pos_1 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1] - 1]
         block_pos_3 = [block_pos_0[0], block_pos_0[1] - 1]
     elif id == 6:
-        block_pos_0 = [5, 1]
+        block_pos_0 = [5, 3]
         block_pos_1 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0], block_pos_0[1] - 1]
         block_pos_3 = [block_pos_0[0] - 1, block_pos_0[1] - 1]
     elif id == 7:
-        block_pos_0 = [5, 1]
+        block_pos_0 = [5, 3]
         block_pos_1 = [block_pos_0[0] - 1, block_pos_0[1]]
         block_pos_2 = [block_pos_0[0], block_pos_0[1] - 1]
         block_pos_3 = [block_pos_0[0] + 1, block_pos_0[1] - 1]
 
-    game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
-    game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
-    game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
-    game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
+    BlockPositionSet(id)
 
 # 블록 떨어지기
 def DroppingBlock():
@@ -91,31 +95,17 @@ def DroppingBlock():
            game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] == 8 or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]] == 8 or\
            game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] == 9 or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]] == 9 or\
            game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] == 9 or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]] == 9:
-
-            # 블록이 바닥과 천장에 모두 닿았을 때 게임 오버
-            if block_pos_0[1] == 0 or block_pos_1[1] == 0 or block_pos_2[1] == 0 or block_pos_3[1] == 0:
-                Running = False  
-                return
             
             block_start_move = False
-            game_grid_list[block_pos_0[1]][block_pos_0[0]] = 9
-            game_grid_list[block_pos_1[1]][block_pos_1[0]] = 9
-            game_grid_list[block_pos_2[1]][block_pos_2[0]] = 9
-            game_grid_list[block_pos_3[1]][block_pos_3[0]] = 9
+            BlockPositionSet(9)
         else:
             start_ticks = pygame.time.get_ticks()
-            game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-            game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-            game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-            game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+            BlockPositionSet(0)
             block_pos_0 = [block_pos_0[0], block_pos_0[1] + 1]
             block_pos_1 = [block_pos_1[0], block_pos_1[1] + 1]
             block_pos_2 = [block_pos_2[0], block_pos_2[1] + 1]
             block_pos_3 = [block_pos_3[0], block_pos_3[1] + 1]
-            game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
-            game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
-            game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
-            game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
+            BlockPositionSet(id)
         
 # 블록 왼쪽으로 움직이기
 def BlockMoveLeft():
@@ -126,18 +116,12 @@ def BlockMoveLeft():
        game_grid_list[block_pos_2[1]][block_pos_2[0] - 1] == 9 or game_grid_list[block_pos_3[1]][block_pos_3[0] - 1] == 9:
         pass
     else:
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+        BlockPositionSet(0)
         block_pos_0 = [block_pos_0[0] - 1, block_pos_0[1]]
         block_pos_1 = [block_pos_1[0] - 1, block_pos_1[1]]
         block_pos_2 = [block_pos_2[0] - 1, block_pos_2[1]]
         block_pos_3 = [block_pos_3[0] - 1, block_pos_3[1]]
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
+        BlockPositionSet(id)
 
 # 블록 오른쪽으로 움직이기
 def BlockMoveRight():
@@ -148,18 +132,12 @@ def BlockMoveRight():
        game_grid_list[block_pos_2[1]][block_pos_2[0] + 1] == 9 or game_grid_list[block_pos_3[1]][block_pos_3[0] + 1] == 9:
         pass
     else:
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+        BlockPositionSet(0)
         block_pos_0 = [block_pos_0[0] + 1, block_pos_0[1]]
         block_pos_1 = [block_pos_1[0] + 1, block_pos_1[1]]
         block_pos_2 = [block_pos_2[0] + 1, block_pos_2[1]]
         block_pos_3 = [block_pos_3[0] + 1, block_pos_3[1]]
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
+        BlockPositionSet(id)
 
 # 블록 빠르게 내려가기
 def Drop():
@@ -173,36 +151,24 @@ def Drop():
             block_start_move = False
 
     else:
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+        BlockPositionSet(0)
         block_pos_0 = [block_pos_0[0], block_pos_0[1] + 1]
         block_pos_1 = [block_pos_1[0], block_pos_1[1] + 1]
         block_pos_2 = [block_pos_2[0], block_pos_2[1] + 1]
         block_pos_3 = [block_pos_3[0], block_pos_3[1] + 1]
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
+        BlockPositionSet(id)
 
 # 블록 바로 내려가기
 def HardDrop():
     global block_pos_0, block_pos_1, block_pos_2, block_pos_3, block_start_move
-    game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-    game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-    game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-    game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+    BlockPositionSet(0)
     while True:
         if (game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]]
          or game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]]) == 8 \
          or (game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]]
          or game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]]) == 9:
 
-            game_grid_list[block_pos_0[1]][block_pos_0[0]] = 9
-            game_grid_list[block_pos_1[1]][block_pos_1[0]] = 9
-            game_grid_list[block_pos_2[1]][block_pos_2[0]] = 9
-            game_grid_list[block_pos_3[1]][block_pos_3[0]] = 9
+            BlockPositionSet(9)
             block_start_move = False
             break
         else:
@@ -226,10 +192,7 @@ def RotateBlock(id, rot):
             rotate -= 1
             return
     else:
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+        BlockPositionSet(0)
         if id == 1:
             if rot == 0 or rot == 2:
                 rotate = 0
@@ -315,13 +278,11 @@ def RotateBlock(id, rot):
                 block_pos_2 = [block_pos_0[0] + 1, block_pos_0[1]]
                 block_pos_3 = [block_pos_0[0] + 1, block_pos_0[1] + 1]
 
-        game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
-        game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
-        game_grid_list[block_pos_2[1]][block_pos_2[0]] = id
-        game_grid_list[block_pos_3[1]][block_pos_3[0]] = id
+        BlockPositionSet(id)
 
 # 블록 라인 점검 (완성되면 삭제)  
 def LineCheck():
+    clear_line = 0
     for idx, line in enumerate(game_grid_list):
         success = True
         for idx_bl, block in enumerate(line):
@@ -330,20 +291,26 @@ def LineCheck():
             if block == 0:
                 success = False
                 break
-            if idx == 19:
+            if idx == rows - 1:
                 success = False
 
         if success == True:
             del game_grid_list[idx]
             game_grid_list.insert(0, [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8])
+            clear_line += 1
+    ScoreAndLevel(clear_line)
+
+# 점수와 레벨관리
+def ScoreAndLevel(cl):
+    global level, score
+    score += randrange(50, 151) * cl
+    level = score // 1000
+    print(level, score)
 
 #블록 홀드
 def BlockHold():
     global block_start_move, hold_block_id, next_block_id, step, id, hold
-    game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
-    game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
-    game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
-    game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+    BlockPositionSet(0)
     if hold_block_id == None:  # hold 처음
         hold_block_id = id
         next_block_id = randrange(1, 8)
@@ -362,7 +329,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Tetris")
 
 # 기본 세팅 값
-rows = 20
+rows = 22
 columns = 12
 cell_size = 25
 block_size = 21
@@ -370,6 +337,7 @@ block_start_move = False
 drop_time = None
 start_ticks = None
 level = 1
+score = 1000
 id = 0
 rotate = 0
 hold = False
@@ -410,7 +378,6 @@ for idx, grid in enumerate(game_grid_list):
     game_grid_list[idx][columns - 1] = 8
 for idx, grid in enumerate(game_grid_list[rows - 1]):
     game_grid_list[rows - 1][idx] = 8
-
 
 # main
 Running = True
@@ -457,6 +424,11 @@ while Running:
         k_down_speed = 0
         
     if block_start_move == False:  # 처음 시작하거나 블록이 배치되거나 hold할 때, 새 블록 생성하기
+        # 게임오버체크
+        for idx, grid in enumerate(game_grid_list[0]):
+            if game_grid_list[2][idx] == 9:
+                Running = False
+                break
         LineCheck()
         rotate = 0
         if hold == True:
@@ -470,7 +442,7 @@ while Running:
 
     DroppingBlock()  # 시간이 지나며 떨어짐
     screen.fill(BLACK)
-    BlockPrint()  # 리스트 화면 출력
+    BlockRender()  # 리스트 화면 출력
 
     pygame.display.update()  # !!! 제발 마지막에 작성 꼭! 해주기 !!!
 
