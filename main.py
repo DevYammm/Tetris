@@ -89,8 +89,8 @@ def DroppingBlock():
     if elapsed_time > drop_time:
         if game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] == 8 or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]] == 8 or\
            game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] == 8 or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]] == 8 or\
-           game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] == 8 or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]] == 9 or\
-           game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] == 8 or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]] == 9:
+           game_grid_list[block_pos_0[1] + 1][block_pos_0[0]] == 9 or game_grid_list[block_pos_1[1] + 1][block_pos_1[0]] == 9 or\
+           game_grid_list[block_pos_2[1] + 1][block_pos_2[0]] == 9 or game_grid_list[block_pos_3[1] + 1][block_pos_3[0]] == 9:
 
             # 블록이 바닥과 천장에 모두 닿았을 때 게임 오버
             if block_pos_0[1] == 0 or block_pos_1[1] == 0 or block_pos_2[1] == 0 or block_pos_3[1] == 0:
@@ -124,7 +124,7 @@ def BlockMoveLeft():
        game_grid_list[block_pos_2[1]][block_pos_2[0] - 1] == 8 or game_grid_list[block_pos_3[1]][block_pos_3[0] - 1] == 8 or\
        game_grid_list[block_pos_0[1]][block_pos_0[0] - 1] == 9 or game_grid_list[block_pos_1[1]][block_pos_1[0] - 1] == 9 or\
        game_grid_list[block_pos_2[1]][block_pos_2[0] - 1] == 9 or game_grid_list[block_pos_3[1]][block_pos_3[0] - 1] == 9:
-        print('wall!')
+        pass
     else:
         game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
         game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
@@ -146,7 +146,7 @@ def BlockMoveRight():
        game_grid_list[block_pos_2[1]][block_pos_2[0] + 1] == 8 or game_grid_list[block_pos_3[1]][block_pos_3[0] + 1] == 8 or\
        game_grid_list[block_pos_0[1]][block_pos_0[0] + 1] == 9 or game_grid_list[block_pos_1[1]][block_pos_1[0] + 1] == 9 or\
        game_grid_list[block_pos_2[1]][block_pos_2[0] + 1] == 9 or game_grid_list[block_pos_3[1]][block_pos_3[0] + 1] == 9:
-        print('wall!')
+        pass
     else:
         game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
         game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
@@ -337,6 +337,23 @@ def LineCheck():
             del game_grid_list[idx]
             game_grid_list.insert(0, [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8])
 
+#블록 홀드
+def BlockHold():
+    global block_start_move, hold_block_id, next_block_id, step, id, hold
+    game_grid_list[block_pos_0[1]][block_pos_0[0]] = 0
+    game_grid_list[block_pos_1[1]][block_pos_1[0]] = 0
+    game_grid_list[block_pos_2[1]][block_pos_2[0]] = 0
+    game_grid_list[block_pos_3[1]][block_pos_3[0]] = 0
+    if hold_block_id == None:  # hold 처음
+        hold_block_id = id
+        next_block_id = randrange(1, 8)
+        id = next_block_id
+    else:
+        step = id
+        id = hold_block_id
+        hold_block_id = step
+
+
 # 초기화
 pygame.init()
 screen_width = 300
@@ -353,7 +370,12 @@ block_start_move = False
 drop_time = None
 start_ticks = None
 level = 1
+id = 0
 rotate = 0
+hold = False
+hold_block_id = None
+next_block_id = None
+step = None
 
 # color
 BLACK = (0, 0, 0)  # 0
@@ -407,16 +429,20 @@ while Running:
                 BlockMoveLeft()
             elif event.key == pygame.K_RIGHT:  # 오른쪽방향키
                 BlockMoveRight()
+            elif event.key == pygame.K_c:
+                hold = True
+                block_start_move = False
+                BlockHold()
 
     if event.type == pygame.KEYDOWN:  # 키가 눌렸을 때
         if event.key == pygame.K_LEFT:
             k_left_speed += 0.1
-            if k_left_speed >= 8:
+            if k_left_speed >= 15:
                 k_left_speed = 0
                 BlockMoveLeft()
         elif event.key == pygame.K_RIGHT:
             k_right_speed += 0.1
-            if k_right_speed >= 8:
+            if k_right_speed >= 15:
                 k_right_speed = 0
                 BlockMoveRight()
         elif event.key == pygame.K_DOWN:
@@ -430,10 +456,14 @@ while Running:
         k_right_speed = 0
         k_down_speed = 0
         
-    if block_start_move == False:  # 처음 시작하거나 블록이 배치되었을 때, 새 블록 생성하기
+    if block_start_move == False:  # 처음 시작하거나 블록이 배치되거나 hold할 때, 새 블록 생성하기
         LineCheck()
         rotate = 0
-        id = randrange(1, 8)
+        if hold == True:
+            hold = False
+        else:
+            next_block_id = randrange(1, 8)
+            id = next_block_id
         start_ticks = pygame.time.get_ticks()
         SpawnBlock(id)
         block_start_move = True
