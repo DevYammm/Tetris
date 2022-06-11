@@ -1,7 +1,7 @@
 import pygame
 from random import *
 
-# 게임 스크린 그리기
+# 스크린 게임 프레임 그리기
 def BlockRender(list):
     for row_idx, row in enumerate(list):
         for col_idx, col in enumerate(row):
@@ -24,7 +24,7 @@ def BlockRender(list):
             elif col == 9:
                 DrawBlock(col_idx, row_idx, GRAY)
 
-# 블록 그리기
+# 스크린에 블록 그리기
 def DrawBlock(col_idx, row_idx, color):
     center_x = (col_idx * cell_size) + (cell_size / 2)
     center_y = (row_idx * cell_size) + (cell_size / 2) - 50
@@ -34,7 +34,15 @@ def DrawBlock(col_idx, row_idx, color):
 
     pygame.draw.rect(screen, color, block)
 
-# 블록 포지션 세팅
+# 블록 포지션 수정
+def blockPosition(x, y):
+    global block_pos_0, block_pos_1, block_pos_2, block_pos_3
+    block_pos_0 = [block_pos_0[0] + x, block_pos_0[1] + y]
+    block_pos_1 = [block_pos_1[0] + x, block_pos_1[1] + y]
+    block_pos_2 = [block_pos_2[0] + x, block_pos_2[1] + y]
+    block_pos_3 = [block_pos_3[0] + x, block_pos_3[1] + y]
+
+# 프레임에 블록 그리기
 def BlockPositionSet(id):
     game_grid_list[block_pos_0[1]][block_pos_0[0]] = id
     game_grid_list[block_pos_1[1]][block_pos_1[0]] = id
@@ -87,7 +95,7 @@ def SpawnBlock(id):
 
 # 블록 떨어지기
 def DroppingBlock():
-    global block_pos_0, block_pos_1, block_pos_2, block_pos_3, start_ticks, block_start_move, Running, rotate, drop_time
+    global block_pos_0, block_pos_1, block_pos_2, block_pos_3, start_ticks, block_start_move, Running, rotate, drop_time, level
     drop_time = 1.5 / level
     elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
     if elapsed_time > drop_time:
@@ -101,10 +109,7 @@ def DroppingBlock():
         else:
             start_ticks = pygame.time.get_ticks()
             BlockPositionSet(0)
-            block_pos_0 = [block_pos_0[0], block_pos_0[1] + 1]
-            block_pos_1 = [block_pos_1[0], block_pos_1[1] + 1]
-            block_pos_2 = [block_pos_2[0], block_pos_2[1] + 1]
-            block_pos_3 = [block_pos_3[0], block_pos_3[1] + 1]
+            blockPosition(0, 1)
             BlockPositionSet(id)
         
 # 블록 왼쪽으로 움직이기
@@ -117,10 +122,7 @@ def BlockMoveLeft():
         pass
     else:
         BlockPositionSet(0)
-        block_pos_0 = [block_pos_0[0] - 1, block_pos_0[1]]
-        block_pos_1 = [block_pos_1[0] - 1, block_pos_1[1]]
-        block_pos_2 = [block_pos_2[0] - 1, block_pos_2[1]]
-        block_pos_3 = [block_pos_3[0] - 1, block_pos_3[1]]
+        blockPosition(-1, 0)
         BlockPositionSet(id)
 
 # 블록 오른쪽으로 움직이기
@@ -133,10 +135,7 @@ def BlockMoveRight():
         pass
     else:
         BlockPositionSet(0)
-        block_pos_0 = [block_pos_0[0] + 1, block_pos_0[1]]
-        block_pos_1 = [block_pos_1[0] + 1, block_pos_1[1]]
-        block_pos_2 = [block_pos_2[0] + 1, block_pos_2[1]]
-        block_pos_3 = [block_pos_3[0] + 1, block_pos_3[1]]
+        blockPosition(1, 0)
         BlockPositionSet(id)
 
 # 블록 빠르게 내려가기
@@ -149,13 +148,10 @@ def Drop():
         elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
         if elapsed_time > drop_time:
             block_start_move = False
-
+            BlockPositionSet(9)
     else:
         BlockPositionSet(0)
-        block_pos_0 = [block_pos_0[0], block_pos_0[1] + 1]
-        block_pos_1 = [block_pos_1[0], block_pos_1[1] + 1]
-        block_pos_2 = [block_pos_2[0], block_pos_2[1] + 1]
-        block_pos_3 = [block_pos_3[0], block_pos_3[1] + 1]
+        blockPosition(0, 1)
         BlockPositionSet(id)
 
 # 블록 바로 내려가기
@@ -172,10 +168,7 @@ def HardDrop():
             block_start_move = False
             break
         else:
-            block_pos_0 = [block_pos_0[0], block_pos_0[1] + 1]
-            block_pos_1 = [block_pos_1[0], block_pos_1[1] + 1]
-            block_pos_2 = [block_pos_2[0], block_pos_2[1] + 1]
-            block_pos_3 = [block_pos_3[0], block_pos_3[1] + 1]
+            blockPosition(0, 1)
 
 # 블록 돌리기
 def RotateBlock(id, rot):
@@ -307,7 +300,7 @@ def ScoreAndLevel(cl):
     level = score // 1000
     print(level, score)
 
-#블록 홀드
+# 블록 홀드
 def BlockHold():
     global block_start_move, hold_block_id, next_block_id, step, id, hold
     BlockPositionSet(0)
@@ -320,6 +313,7 @@ def BlockHold():
         id = hold_block_id
         hold_block_id = step
 
+# 사이드 next and hold 블록 렌더
 def sideBlockRender(list, id, gap):
 
     if id == 0:
@@ -397,7 +391,7 @@ block_size = 21
 block_start_move = False
 drop_time = None
 start_ticks = None
-level = 1
+#level = 10
 score = 1000
 id = 0
 rotate = 0
@@ -432,7 +426,7 @@ k_down_speed = 0
 # 폰트
 game_font = pygame.font.Font(None, 120)
 
-# 기본 틀 그리기
+# 기본 게임 프레임 설정
 game_grid_list = [[0 for col in range(columns)] for row in range(rows)]
 for idx, grid in enumerate(game_grid_list):
     game_grid_list[idx][0] = 8
@@ -440,6 +434,7 @@ for idx, grid in enumerate(game_grid_list):
 for idx, grid in enumerate(game_grid_list[rows - 1]):
     game_grid_list[rows - 1][idx] = 8
 
+# 사이드 next and hold 설정
 next_block_list = [[0, 0, 0, 0], [0, 0, 0, 0]]
 hold_block_list = [[0, 0, 0, 0], [0, 0, 0, 0]]
 
@@ -464,7 +459,6 @@ while Running:
                 hold = True
                 block_start_move = False
 
-
     if event.type == pygame.KEYDOWN:  # 키가 눌렸을 때
         if event.key == pygame.K_LEFT:
             k_left_speed += 0.1
@@ -478,7 +472,7 @@ while Running:
                 BlockMoveRight()
         elif event.key == pygame.K_DOWN:
             k_down_speed += 0.1
-            if k_down_speed >= 5 // level:
+            if k_down_speed >= 3 : #// level:
                 k_down_speed = 0
                 Drop()
 
