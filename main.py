@@ -2,8 +2,8 @@ import pygame
 from random import *
 
 # 게임 스크린 그리기
-def BlockRender():
-    for row_idx, row in enumerate(game_grid_list):
+def BlockRender(list):
+    for row_idx, row in enumerate(list):
         for col_idx, col in enumerate(row):
             if col == 8:
                 DrawBlock(col_idx, row_idx, WHITE)
@@ -313,17 +313,78 @@ def BlockHold():
     BlockPositionSet(0)
     if hold_block_id == None:  # hold 처음
         hold_block_id = id
-        next_block_id = randrange(1, 8)
         id = next_block_id
+        next_block_id = randrange(1, 8)
     else:
         step = id
         id = hold_block_id
         hold_block_id = step
 
+def sideBlockRender(list, id, gap):
+
+    if id == 0:
+        pass
+    elif id == 1:
+        list[1][1] = id
+        list[1][0] = id
+        list[1][2] = id
+        list[1][3] = id
+    elif id == 2:
+        list[1][1] = id
+        list[1][0] = id
+        list[1][2] = id
+        list[0][1] = id
+    elif id == 3:
+        list[1][1] = id
+        list[1][0] = id
+        list[1][2] = id
+        list[0][0] = id
+    elif id == 4:
+        list[1][1] = id
+        list[1][0] = id
+        list[1][2] = id
+        list[0][2] = id
+    elif id == 5:
+        list[1][0] = id
+        list[1][1] = id
+        list[0][1] = id
+        list[0][0] = id
+    elif id == 6:
+        list[1][1] = id
+        list[1][2] = id
+        list[0][1] = id
+        list[0][0] = id
+    elif id == 7:
+        list[1][1] = id
+        list[1][0] = id
+        list[0][1] = id
+        list[0][2] = id
+
+    for row_idx, row in enumerate(list):
+        for col_idx, col in enumerate(row):
+            if col == 8:
+                DrawBlock(col_idx + 13, row_idx + gap, WHITE)
+            elif col == 1:
+                DrawBlock(col_idx + 13, row_idx + gap, MINT)
+            elif col == 2:
+                DrawBlock(col_idx + 13, row_idx + gap, PURPLE)
+            elif col == 3:
+                DrawBlock(col_idx + 13, row_idx + gap, BLUE)
+            elif col == 4:
+                DrawBlock(col_idx + 13, row_idx + gap, ORANGE)
+            elif col == 5:
+                DrawBlock(col_idx + 13, row_idx + gap, YELLOW)
+            elif col == 6:
+                DrawBlock(col_idx + 13, row_idx + gap, RED)
+            elif col == 7:
+                DrawBlock(col_idx + 13, row_idx + gap, GREEN)
+            elif col == 9:
+                DrawBlock(col_idx + 13, row_idx + gap, GRAY)
+
 
 # 초기화
 pygame.init()
-screen_width = 300
+screen_width = 500
 screen_height = 500
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Tetris")
@@ -342,7 +403,7 @@ id = 0
 rotate = 0
 hold = False
 hold_block_id = None
-next_block_id = None
+next_block_id = randrange(1, 8)
 step = None
 
 # color
@@ -379,6 +440,9 @@ for idx, grid in enumerate(game_grid_list):
 for idx, grid in enumerate(game_grid_list[rows - 1]):
     game_grid_list[rows - 1][idx] = 8
 
+next_block_list = [[0, 0, 0, 0], [0, 0, 0, 0]]
+hold_block_list = [[0, 0, 0, 0], [0, 0, 0, 0]]
+
 # main
 Running = True
 while Running:
@@ -399,7 +463,7 @@ while Running:
             elif event.key == pygame.K_c:
                 hold = True
                 block_start_move = False
-                BlockHold()
+
 
     if event.type == pygame.KEYDOWN:  # 키가 눌렸을 때
         if event.key == pygame.K_LEFT:
@@ -429,20 +493,27 @@ while Running:
             if game_grid_list[2][idx] == 9:
                 Running = False
                 break
+
         LineCheck()
         rotate = 0
+        next_block_list = [[0, 0, 0, 0], [0, 0, 0, 0]]
+        hold_block_list = [[0, 0, 0, 0], [0, 0, 0, 0]]
+
         if hold == True:
             hold = False
+            BlockHold()
         else:
-            next_block_id = randrange(1, 8)
             id = next_block_id
+            next_block_id = randrange(1, 8)
         start_ticks = pygame.time.get_ticks()
         SpawnBlock(id)
         block_start_move = True
 
     DroppingBlock()  # 시간이 지나며 떨어짐
     screen.fill(BLACK)
-    BlockRender()  # 리스트 화면 출력
+    BlockRender(game_grid_list)  # 리스트 화면 출력
+    sideBlockRender(next_block_list, next_block_id, 3)
+    sideBlockRender(hold_block_list, hold_block_id, 15)
 
     pygame.display.update()  # !!! 제발 마지막에 작성 꼭! 해주기 !!!
 
